@@ -82,7 +82,7 @@ export default {
       await db.insert(this.form)
     },
     async dbRead () {
-      const rs = await db.find()
+      const rs = await db.findOne()
       console.log(rs)
     }
   }
