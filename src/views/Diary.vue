@@ -18,6 +18,17 @@
               <template v-slot:item.updatedAt="{item}">
                   {{ item.updatedAt.toLocaleString() }}
               </template>
+              <template v-slot:item.title="{item}">
+                  <a @click="dialogEditOpen(item)">{{ item.title }}</a>
+              </template>
+              <template v-slot:item._id="{item}">
+                  <v-btn @click="dialogReadOpen(item)">
+                      <v-icon>mdi-pencil</v-icon>
+                  </v-btn>
+                  <v-btn @click="del(item)">
+                      <v-icon>mdi-delete</v-icon>
+                  </v-btn>
+              </template>
           </v-data-table>
       </v-card-text>
       <v-dialog v-model="dialogAdd">
@@ -44,18 +55,15 @@
                 </v-card-action>
           </v-card>
       </v-dialog>
-      <!-- <v-dialog v-model="dialogAdd">
+      <v-dialog v-model="dialogRead">
           <v-card>
-                <v-card-title>글 작성</v-card-title>
+                <v-card-title>{{ select.title }}</v-card-title>
                 <v-card-text>
-                    <v-text-field label="제목" v-model="title"></v-text-field>
-                    <editor :initialValue="content" ref="toastuiEditor" />
+                    <viewer :initialValue="content" />
                 </v-card-text>
-                <v-card-action>
-                    <v-btn>test</v-btn>
-                </v-card-action>
           </v-card>
-      </v-dialog> -->
+      </v-dialog>
+
     </v-card>
   </v-container>
 </template>
@@ -64,15 +72,15 @@
 import 'codemirror/lib/codemirror.css'
 import '@toast-ui/editor/dist/toastui-editor.css'
 import '@toast-ui/editor/dist/toastui-editor-viewer.css'
-import { Editor } from '@toast-ui/vue-editor'
+import { Editor, Viewer } from '@toast-ui/vue-editor'
 const Datastore = require('nedb-promises')
 const Diary = Datastore.create('diary.db')
 const DiaryContent = Datastore.create('diaryContent.db')
 
 export default {
   components: {
-    editor: Editor
-    // viewer: Viewer
+    editor: Editor,
+    viewer: Viewer
   },
   data () {
     return {
@@ -85,13 +93,18 @@ export default {
       headers: [
         { value: 'createdAt', text: '작성일' },
         { value: 'updatedAt', text: '수정일' },
-        { value: 'title', text: '제목' }
+        { value: 'title', text: '제목' },
+        { value: '_id', text: 'actions' }
       ],
-      items: []
+      items: [],
+      select: {
+        title: '',
+        content: ''
+      }
     }
   },
   async mounted () {
-    await this.removeAll()
+    // await this.removeAll()
     await this.list()
   },
   methods: {
@@ -103,6 +116,21 @@ export default {
       this.title = ''
       this.content = ''
       this.dialogAdd = true
+    },
+    async dialogEditOpen (item) {
+      this.title = item.title
+      const dc = await DiaryContent.findOne({ _id: item._content })
+      this.content = dc.content
+      this.select = item
+      this.dialogEdit = true
+    },
+    async dialogReadOpen (item) {
+      this.title = item.title
+      const dc = await DiaryContent.findOne({ _id: item._content })
+      this.content = dc.content
+      this.select = item
+      this.select.content = this.content
+      this.dialogRead = true
     },
     async add () {
       this.content = this.$refs.toastuiEditor.invoke('getMarkdown')
@@ -118,13 +146,25 @@ export default {
     },
     async list () {
       this.items = await Diary.find()
-      console.log(this.items)
     },
-    update () {
-
+    async update () {
+      this.content = this.$refs.toastuiEditor.invoke('getMarkdown')
+      await DiaryContent.update({ _id: this.select._content }, { $set: { content: this.content } })
+      await Diary.update(
+        { _id: this.select._id },
+        {
+          $set: {
+            title: this.title,
+            updatedAt: new Date()
+          }
+        })
+      this.dialogEdit = false
+      await this.list()
     },
-    del () {
-
+    async del (item) {
+      await DiaryContent.remove({ _id: item._content })
+      await Diary.remove({ _id: item._id })
+      await this.list()
     }
   }
 }
