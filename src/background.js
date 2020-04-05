@@ -1,6 +1,6 @@
 'use strict'
 
-import { app, protocol, BrowserWindow } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain, net } from 'electron'
 import {
   createProtocol
   /* installVueDevtools */
@@ -10,7 +10,6 @@ const isDevelopment = process.env.NODE_ENV !== 'production'
 // Keep a global reference of the window object, if you don't, the window will
 // be closed automatically when the JavaScript object is garbage collected.
 let win
-
 // Scheme must be registered before the app is ready
 protocol.registerSchemesAsPrivileged([{ scheme: 'app', privileges: { secure: true, standard: true } }])
 
@@ -74,6 +73,19 @@ app.on('ready', async () => {
     // }
 
   }
+  const request = net.request('http://localhost:3000/posts/1')
+  request.on('response', (response) => {
+    console.log(`STATUS: ${response.statusCode}`)
+    console.log(`HEADERS: ${JSON.stringify(response.headers)}`)
+    response.on('data', (chunk) => {
+      console.log(`BODY: ${chunk}`)
+    })
+    response.on('end', () => {
+      console.log('No more data in response.')
+    })
+  })
+
+  request.end()
   createWindow()
 })
 
@@ -91,3 +103,7 @@ if (isDevelopment) {
     })
   }
 }
+ipcMain.on('asynchronous-message', (event, arg) => {
+  console.log(arg) // "ping" 출력
+  event.reply('asynchronous-reply', 'pong')
+})

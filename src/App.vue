@@ -1,21 +1,17 @@
 <template>
   <v-app>
-      <Diary />
+      <ElectronApi />
   </v-app>
 </template>
 
 <script>
-import Diary from './views/Diary'
+import ElectronApi from './views/ElectronApi'
 
 export default {
   name: 'App',
 
   components: {
-    Diary
-  },
-
-  data: () => ({
-    //
-  })
+    ElectronApi
+  }
 }
 </script>

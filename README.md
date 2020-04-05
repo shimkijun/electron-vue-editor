@@ -1,24 +1,24 @@
 # lecture-electron-vue
 
-## Project setup
+## 패키지 설치
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+## Json server start
 ```
-npm run serve
-```
-
-### Compiles and minifies for production
-```
-npm run build
+npx json-server --watch db.json
 ```
 
-### Lints and fixes files
+## json server test
 ```
-npm run lint
+ http://localhost:3000/posts/1
 ```
 
-### Customize configuration
-See [Configuration Reference](https://cli.vuejs.org/config/).
+## Notification
+```
+알람을 켜놓자..
+```
+
+### Reference
+[Json server](https://www.npmjs.com/package/json-server)
