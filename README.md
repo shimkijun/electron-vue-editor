@@ -20,5 +20,10 @@ npx json-server --watch db.json
 알람을 켜놓자..
 ```
 
+## Node Api
+```
+electron 과 node api는 호환 가능 (전부x)
+```
+
 ### Reference
 [Json server](https://www.npmjs.com/package/json-server)
