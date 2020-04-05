@@ -42,7 +42,7 @@ export default {
       })
       ipcRenderer.send('asynchronous-message', 'ping')
     },
-    async showNotificationTest () {
+    showNotificationTest () {
       const options = {
         title: '제목임다요',
         body: 'No Body No Body 버츄',
