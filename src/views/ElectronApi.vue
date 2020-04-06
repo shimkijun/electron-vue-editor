@@ -4,6 +4,13 @@
         <div><v-btn color="warning" @click="showMenuTest">showMenu</v-btn></div>
         <div><v-btn color="red" @click="actionIpcSyncTest">actionIpcSync</v-btn></div>
         <div><v-btn @click="showNotificationTest">showNotification</v-btn></div>
+        <div>
+          <v-btn @click="yotubeDownload">유튜브 mp4</v-btn>
+          <v-text-field
+            v-model="youtubeLink"
+            label="youtube link"
+           />
+        </div>
     </v-container>
 </template>
 <script>
@@ -13,7 +20,7 @@ const { dialog, Menu, MenuItem, Notification } = remote
 export default {
   data () {
     return {
-
+      youtubeLink: ''
     }
   },
   methods: {
@@ -51,6 +58,12 @@ export default {
       }
       const notification = new Notification(options)
       notification.show()
+    },
+    yotubeDownload () {
+      ipcRenderer.on('youtubeDownloadSuccess', (event, arg) => {
+        console.log(arg) // "pong"이 출력됩니다.
+      })
+      ipcRenderer.send('youtubeDownload', this.youtubeLink)
     }
   }
 }

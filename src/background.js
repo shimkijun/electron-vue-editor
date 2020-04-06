@@ -1,10 +1,11 @@
 'use strict'
 
-import { app, protocol, BrowserWindow, ipcMain, net } from 'electron'
+import { app, protocol, BrowserWindow, ipcMain } from 'electron'
 import {
   createProtocol
   /* installVueDevtools */
 } from 'vue-cli-plugin-electron-builder/lib'
+
 const isDevelopment = process.env.NODE_ENV !== 'production'
 
 // Keep a global reference of the window object, if you don't, the window will
@@ -59,40 +60,14 @@ app.on('activate', () => {
 // initialization and is ready to create browser windows.
 // Some APIs can only be used after this event occurs.
 app.on('ready', async () => {
-  const path = require('path')
-  const os = require('os')
-
-  //
-  BrowserWindow.addDevToolsExtension(
-    path.join(os.homedir(), '/AppData/Local/Google/Chrome/User Data/Default/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/5.3.3_0')
-  )
   if (isDevelopment && !process.env.IS_TEST) {
-    // Install Vue Devtools
-    // Devtools extensions are broken in Electron 6.0.0 and greater
-    // See https://github.com/nklayman/vue-cli-plugin-electron-builder/issues/378 for more info
-    // Electron will not launch with Devtools extensions installed on Windows 10 with dark mode
-    // If you are not using Windows 10 dark mode, you may uncomment these lines
-    // In addition, if the linked issue is closed, you can upgrade electron and uncomment these lines
-    // try {
-    //   await installVueDevtools()
-    // } catch (e) {
-    //   console.error('Vue Devtools failed to install:', e.toString())
-    // }
-
+    const path = require('path')
+    const os = require('os')
+    BrowserWindow.addDevToolsExtension(
+      path.join(os.homedir(), '/AppData/Local/Google/Chrome/User Data/Default/Extensions/nhdogjmejiglipccpnnnanhbledajbpd/5.3.3_0')
+    )
   }
-  const request = net.request('http://localhost:3000/posts/1')
-  request.on('response', (response) => {
-    console.log(`STATUS: ${response.statusCode}`)
-    console.log(`HEADERS: ${JSON.stringify(response.headers)}`)
-    response.on('data', (chunk) => {
-      console.log(`BODY: ${chunk}`)
-    })
-    response.on('end', () => {
-      console.log('No more data in response.')
-    })
-  })
 
-  request.end()
   createWindow()
 })
 
@@ -113,4 +88,26 @@ if (isDevelopment) {
 ipcMain.on('asynchronous-message', (event, arg) => {
   console.log(arg) // "ping" 출력
   event.reply('asynchronous-reply', 'pong')
+})
+
+ipcMain.on('youtubeDownload', (event, arg) => {
+  const fs = require('fs')
+  const youtubedl = require('youtube-dl')
+  console.log(__dirname)
+  console.log(arg)
+
+  const video = youtubedl(arg,
+  // Optional arguments passed to youtube-dl.
+    ['--format=18'],
+    // Additional options can be given for calling `child_process.execFile()`.
+    { cwd: __dirname })
+
+  // Will be called when the download starts.
+  video.on('info', function (info) {
+    console.log('Download started')
+    console.log('filename: ' + info._filename)
+    console.log('size: ' + info.size)
+    event.reply('youtubeDownloadSuccess', info)
+  })
+  video.pipe(fs.createWriteStream('myvideo.mp4'))
 })
