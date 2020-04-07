@@ -1,17 +1,17 @@
 <template>
   <v-app>
-      <ElectronApi />
+      <Home />
   </v-app>
 </template>
 
 <script>
-import ElectronApi from './views/ElectronApi'
+import Home from './views/Home'
 
 export default {
   name: 'App',
 
   components: {
-    ElectronApi
+    Home
   }
 }
 </script>
