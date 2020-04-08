@@ -23,7 +23,7 @@
                     <v-list-item-icon>
                     <v-icon>mdi-home</v-icon>
                     </v-list-item-icon>
-                    <v-list-item-title>Home</v-list-item-title>
+                    <v-list-item-title><router-link to="/">Home</router-link></v-list-item-title>
                 </v-list-item>
                 <v-list-group
                     value="true"
@@ -66,7 +66,7 @@
                             v-for="(crud, i) in cruds"
                             :key="i"
                         >
-                            <v-list-item-title v-text="crud[0]"></v-list-item-title>
+                            <v-list-item-title :to="crud[1]" v-text="crud[0]"></v-list-item-title>
                             <v-list-item-action>
                                 <v-icon>mdi-home</v-icon>
                             </v-list-item-action>
@@ -84,7 +84,7 @@ export default {
     return {
       drawer: false,
       admins: [
-        ['Management', 'people_outline'],
+        ['ElectronApi', '/ElectronApi'],
         ['Settings', 'settings']
       ],
       cruds: [

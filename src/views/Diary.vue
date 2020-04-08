@@ -3,6 +3,7 @@
     <v-card>
       <v-toolbar dense flat color="primary" dark>
         <v-toolbar-title>
+         <router-link to="/">main</router-link>
           게시판
         </v-toolbar-title>
         <v-spacer></v-spacer>
@@ -63,7 +64,6 @@
                 </v-card-text>
           </v-card>
       </v-dialog>
-
     </v-card>
   </v-container>
 </template>
